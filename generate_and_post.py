@@ -44,7 +44,27 @@ def which_half():
         return "пт-нд", "П'ятниця, Субота, Неділя", 3, "900"
 
 
-def generate_menu():
+
+
+
+def split_text(text, limit=4000):
+    text = text.strip()
+    if len(text) <= limit:
+        return [text]
+    parts = []
+    while len(text) > limit:
+        chunk = text[:limit]
+        cut = chunk.rfind("\n\n")
+        if cut < limit * 0.5:
+            cut = chunk.rfind("\n")
+        if cut < limit * 0.5:
+            cut = chunk.rfind(". ")
+            if cut != -1:
+                cut += 1
+        if cut < limit * 0.5:
+            cut = limit
+        parts.append(text[:cut].strip())
+        tdef generate_menu():
     short, days, n, budget = which_half()
     prompt = (
         f"Склади меню на {n} дні ({days}) для двох людей — чоловіка і дружини.\n\n"
@@ -128,26 +148,7 @@ def generate_menu():
         "клітковини/води або як уникнути зайвого голоду між прийомами]"
     )
     return ask_gemini(prompt)
-
-
-def split_text(text, limit=4000):
-    text = text.strip()
-    if len(text) <= limit:
-        return [text]
-    parts = []
-    while len(text) > limit:
-        chunk = text[:limit]
-        cut = chunk.rfind("\n\n")
-        if cut < limit * 0.5:
-            cut = chunk.rfind("\n")
-        if cut < limit * 0.5:
-            cut = chunk.rfind(". ")
-            if cut != -1:
-                cut += 1
-        if cut < limit * 0.5:
-            cut = limit
-        parts.append(text[:cut].strip())
-        text = text[cut:].strip()
+    ext = text[cut:].strip()
     if text:
         parts.append(text)
     return parts
